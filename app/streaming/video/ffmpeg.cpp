@@ -757,11 +757,11 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
     switch (m_VideoFormat)
     {
     case VIDEO_FORMAT_H264:
-        codecString = "H.264";
+        codecString = "AVC";
         break;
 
     case VIDEO_FORMAT_H264_HIGH8_444:
-        codecString = "H.264 4:4:4";
+        codecString = "AVC 444";
         break;
 
     case VIDEO_FORMAT_H265:
@@ -769,7 +769,7 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
         break;
 
     case VIDEO_FORMAT_H265_REXT8_444:
-        codecString = "HEVC 4:4:4";
+        codecString = "HEVC 444";
         break;
 
     case VIDEO_FORMAT_H265_MAIN10:
@@ -786,11 +786,11 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
     case VIDEO_FORMAT_H265_REXT10_444:
         if (LiGetCurrentHostDisplayHdrMode())
         {
-            codecString = "HEVC 10-bit HDR 4:4:4";
+            codecString = "HEVC 10-bit HDR 444";
         }
         else
         {
-            codecString = "HEVC 10-bit SDR 4:4:4";
+            codecString = "HEVC 10-bit SDR 444";
         }
         break;
 
@@ -799,7 +799,7 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
         break;
 
     case VIDEO_FORMAT_AV1_HIGH8_444:
-        codecString = "AV1 4:4:4";
+        codecString = "AV1 444";
         break;
 
     case VIDEO_FORMAT_AV1_MAIN10:
@@ -816,11 +816,11 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
     case VIDEO_FORMAT_AV1_HIGH10_444:
         if (LiGetCurrentHostDisplayHdrMode())
         {
-            codecString = "AV1 10-bit HDR 4:4:4";
+            codecString = "AV1 10-bit HDR 444";
         }
         else
         {
-            codecString = "AV1 10-bit SDR 4:4:4";
+            codecString = "AV1 10-bit SDR 444";
         }
         break;
 
@@ -833,7 +833,7 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
     // Display if AI-Enhancement is enabled
     const char* aiEnhanced = "";
     if(m_VideoEnhancement->isVideoEnhancementEnabled()){
-        aiEnhanced = "AI-Enhanced";
+        aiEnhanced = "AI";
     }
 
     if (stats.receivedFps > 0)
@@ -861,10 +861,8 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
 
         ret = snprintf(&output[offset],
                        length - offset,
-                       " {18}FPS  %.1f {14}Rx{18} · %.1f {14}De{18} · %.1f {14}Rd{18} \n",
-                       stats.receivedFps,
-                       stats.decodedFps,
-                       stats.renderedFps);
+                       " {18}FPS %.1f \n",
+                       stats.receivedFps);
         if (ret < 0 || ret >= length - offset)
         {
             SDL_assert(false);
@@ -882,7 +880,7 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
 
         if (stats.lastRtt != 0)
         {
-            snprintf(rttString, sizeof(rttString), "**%u** ± %ums", stats.lastRtt, stats.lastRttVariance);
+            snprintf(rttString, sizeof(rttString), "%u±%ums", stats.lastRtt, stats.lastRttVariance);
         }
         else
         {
@@ -894,11 +892,11 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
             if (bandwidthKbps >= 1000)
             {
                 float mbps = bandwidthKbps / 1000.0f;
-                snprintf(bandwidthString, sizeof(bandwidthString), "**%.2f** {16}Mbps{18}", mbps);
+                snprintf(bandwidthString, sizeof(bandwidthString), "%.2f {16}M{18}", mbps);
             }
             else
             {
-                snprintf(bandwidthString, sizeof(bandwidthString), "**%d** {16}Kbps{18}", bandwidthKbps);
+                snprintf(bandwidthString, sizeof(bandwidthString), "%d {16}K{18}", bandwidthKbps);
             }
         }
         else
@@ -908,12 +906,12 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
 
         ret = snprintf(&output[offset],
                        length - offset,
-                       " Network %s "
-                       " Loss %.2f%% "
-                       " Bandwidth %s "
+                       " Net %s "
+                       " PL %.1f%% "
+                       " - %s "
                     //    " Queue %.2fms "
-                       " {16}|  {18}Render **%.2f**ms "
-                       "· Decode **%.2f**ms ",
+                       " {16}|  {18}Rnd %.1fms "
+                       "· Dec %.1fms ",
                        rttString,
                        (float)stats.networkDroppedFrames / stats.totalFrames * 100,
                        bandwidthString,
@@ -933,7 +931,7 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
     {
         ret = snprintf(&output[offset],
                        length - offset,
-                       "· Encode **%.1f**ms ",
+                       "· Enc %.1fms ",
                        //    (float)stats.minHostProcessingLatency / 10,
                        //    (float)stats.maxHostProcessingLatency / 10,
                        (float)stats.totalHostProcessingLatency / 10 / stats.framesWithHostProcessingLatency);
