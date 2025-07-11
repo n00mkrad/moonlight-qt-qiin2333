@@ -861,7 +861,7 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
 
         ret = snprintf(&output[offset],
                        length - offset,
-                       " {18}FPS %.1f \n",
+                       " {18}FPS %.0f \n",
                        stats.receivedFps);
         if (ret < 0 || ret >= length - offset)
         {
@@ -892,7 +892,7 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
             if (bandwidthKbps >= 1000)
             {
                 float mbps = bandwidthKbps / 1000.0f;
-                snprintf(bandwidthString, sizeof(bandwidthString), "%.2f {16}M{18}", mbps);
+                snprintf(bandwidthString, sizeof(bandwidthString), "%.1f {16}M{18}", mbps);
             }
             else
             {
@@ -907,16 +907,16 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
         ret = snprintf(&output[offset],
                        length - offset,
                        " Net %s "
-                       " PL %.1f%% "
+                       " PL %.0f%% "
                        " - %s "
                     //    " Queue %.2fms "
-                       " {16}|  {18}Rnd %.1fms "
-                       "· Dec %.1fms ",
+                       "  {18}"
+                       "· Dec %.0fms ",
                        rttString,
                        (float)stats.networkDroppedFrames / stats.totalFrames * 100,
                        bandwidthString,
                     //    (float)stats.totalPacerTime / stats.renderedFrames,
-                       (float)stats.totalRenderTime / stats.renderedFrames,
+                       // (float)stats.totalRenderTime / stats.renderedFrames,
                        (float)stats.totalDecodeTime / stats.decodedFrames);
         if (ret < 0 || ret >= length - offset)
         {
@@ -931,7 +931,7 @@ void FFmpegVideoDecoder::stringifyVideoStats(VIDEO_STATS &stats, char *output, i
     {
         ret = snprintf(&output[offset],
                        length - offset,
-                       "· Enc %.1fms ",
+                       "· Enc %.0fms ",
                        //    (float)stats.minHostProcessingLatency / 10,
                        //    (float)stats.maxHostProcessingLatency / 10,
                        (float)stats.totalHostProcessingLatency / 10 / stats.framesWithHostProcessingLatency);
